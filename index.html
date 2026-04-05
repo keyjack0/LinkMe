@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkMe — Your Links, One Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root {
+    --cream: #F9F8F6;
+    --blue: #1B56FD;
+    --blue-dark: #1240cc;
+    --blue-pale: #EEF3FF;
+    --ink: #0A0A0A;
+    --ink-muted: #6B6B6B;
+    --ink-light: #B0AFAC;
+    --white: #FFFFFF;
+    --border: rgba(10,10,10,0.08);
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── CURSOR ─── */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--blue);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--blue);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.1s ease;
+    mix-blend-mode: multiply;
+    opacity: 0.5;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(249,248,246,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    transition: padding 0.3s ease;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--blue); }
+  .nav-links {
+    display: flex; gap: 36px; list-style: none;
+  }
+  .nav-links a {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .btn-ghost {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 100px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--ink-muted); }
+  .btn-primary {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white);
+    background: var(--blue);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 100px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    padding: 140px 48px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: var(--blue-pale);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+  .hero-label::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--blue);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .hero-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .hero-h1 .accent { color: var(--blue); }
+  .hero-h1 .stroke-text {
+    -webkit-text-stroke: 2px var(--ink);
+    color: transparent;
+  }
+  .hero-desc {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--ink-muted);
+    max-width: 440px;
+    margin-bottom: 44px;
+    line-height: 1.7;
+  }
+  .hero-actions {
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+  }
+  .btn-hero {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--white);
+    background: var(--blue);
+    border: none;
+    padding: 16px 36px;
+    border-radius: 100px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.25s;
+  }
+  .btn-hero:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(27,86,253,0.3); }
+  .btn-hero svg { transition: transform 0.2s; }
+  .btn-hero:hover svg { transform: translateX(4px); }
+  .hero-social-proof {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--ink-muted);
+  }
+  .avatar-stack {
+    display: flex;
+  }
+  .avatar-stack img, .avatar-fallback {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cream);
+    margin-left: -8px;
+  }
+  .avatar-fallback:first-child { margin-left: 0; }
+  .avatar-fallback {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--white);
+  }
+  .af-1 { background: #6366F1; }
+  .af-2 { background: #EC4899; }
+  .af-3 { background: #F59E0B; }
+  .af-4 { background: #10B981; }
+
+  /* ─── HERO VISUAL ─── */
+  .hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .phone-mockup {
+    width: 280px;
+    background: var(--white);
+    border-radius: 44px;
+    padding: 24px 20px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+    position: relative;
+    z-index: 2;
+  }
+  .phone-notch {
+    width: 80px;
+    height: 28px;
+    background: var(--ink);
+    border-radius: 100px;
+    margin: 0 auto 20px;
+  }
+  .profile-block {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .profile-avatar {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--blue) 0%, #7C3AED 100%);
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--white);
+  }
+  .profile-name {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .profile-handle {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+  .profile-bio {
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .link-card:hover { transform: scale(1.02); }
+  .lc-blue { background: var(--blue); }
+  .lc-dark { background: var(--ink); }
+  .lc-purple { background: #7C3AED; }
+  .lc-pink { background: #EC4899; }
+  .lc-green { background: #059669; }
+  .link-icon {
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+  .link-label { flex: 1; }
+  .link-arrow {
+    opacity: 0.7;
+    font-size: 12px;
+  }
+  .floating-badge {
+    position: absolute;
+    background: var(--white);
+    border-radius: 14px;
+    padding: 10px 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fb-1 { top: 10%; right: -60px; }
+  .fb-2 { bottom: 20%; left: -70px; }
+  .fb-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .fb-dot-blue { background: var(--blue); }
+  .fb-dot-green { background: #10B981; }
+  .hero-bg-circle {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(27,86,253,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  /* ─── MARQUEE ─── */
+  .marquee-section {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--white);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 60px;
+    animation: marquee 20s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .marquee-dot {
+    width: 6px; height: 6px;
+    background: var(--blue);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ─── SECTIONS SHARED ─── */
+  section { padding: 120px 48px; }
+  .section-max { max-width: 1300px; margin: 0 auto; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .section-h2 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+  .section-desc {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink-muted);
+    max-width: 520px;
+    line-height: 1.75;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  #how {
+    background: var(--white);
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 64px;
+  }
+  .step-card {
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    background: var(--cream);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .step-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.08);
+  }
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 80px;
+    font-weight: 800;
+    color: var(--border);
+    position: absolute;
+    top: 20px; right: 24px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .step-icon {
+    width: 52px; height: 52px;
+    background: var(--blue-pale);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+    font-size: 22px;
+  }
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+  }
+  .step-desc {
+    font-size: 15px;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  /* ─── FEATURES ─── */
+  #features {
+    background: var(--ink);
+    color: var(--cream);
+  }
+  #features .section-h2 { color: var(--cream); }
+  #features .section-desc { color: rgba(249,248,246,0.5); }
+  #features .section-label { color: #6C8FFF; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 64px;
+  }
+  .features-list { display: flex; flex-direction: column; gap: 8px; }
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid transparent;
+  }
+  .feature-item:hover, .feature-item.active {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .feature-item.active .fi-icon {
+    background: var(--blue);
+  }
+  .fi-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .fi-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+  }
+  .fi-desc {
+    font-size: 14px;
+    color: rgba(249,248,246,0.45);
+    line-height: 1.6;
+  }
+  .features-mockup {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 28px;
+    padding: 32px;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .fm-header {
+    display: flex; gap: 8px; margin-bottom: 8px;
+  }
+  .fm-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .fm-red { background: #FF5F57; }
+  .fm-yellow { background: #FFBD2E; }
+  .fm-green { background: #28C840; }
+  .fm-url {
+    flex: 1;
+    height: 32px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 12px;
+    color: rgba(249,248,246,0.35);
+    font-family: 'DM Mono', monospace;
+    overflow: hidden;
+  }
+  .analytics-card {
+    background: rgba(27,86,253,0.15);
+    border: 1px solid rgba(27,86,253,0.3);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .ac-stat {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--cream);
+  }
+  .ac-label {
+    font-size: 13px;
+    color: rgba(249,248,246,0.45);
+    margin-top: 2px;
+  }
+  .ac-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 48px;
+    margin-top: 16px;
+  }
+  .ac-bar {
+    flex: 1;
+    background: rgba(27,86,253,0.4);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.6s ease;
+  }
+  .ac-bar-active { background: var(--blue); }
+  .mini-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ml-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    font-size: 13px;
+    color: rgba(249,248,246,0.6);
+  }
+  .ml-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ml-progress {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(249,248,246,0.35);
+  }
+  .progress-bar {
+    width: 60px; height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 2px;
+  }
+
+  /* ─── SHOWCASE ─── */
+  #showcase {
+    background: var(--cream);
+  }
+  .showcase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 56px;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .template-card {
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background: var(--white);
+  }
+  .template-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 32px 64px rgba(0,0,0,0.1);
+  }
+  .tc-preview {
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tc-1 { background: linear-gradient(160deg, #0F172A 0%, #1E3A8A 100%); }
+  .tc-2 { background: linear-gradient(160deg, #FFF7ED 0%, #FBBF24 100%); }
+  .tc-3 { background: linear-gradient(160deg, #F0FDF4 0%, #4ADE80 100%); }
+  .tc-4 { background: linear-gradient(160deg, #FDF4FF 0%, #C084FC 100%); }
+  .tc-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 18px;
+  }
+  .tca-1 { background: var(--blue); color: white; }
+  .tca-2 { background: #EF4444; color: white; }
+  .tca-3 { background: #059669; color: white; }
+  .tca-4 { background: #7C3AED; color: white; }
+  .tc-mini-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .tc-1 .tc-mini-name, .tc-1 .tc-handle { color: rgba(255,255,255,0.9); }
+  .tc-handle { font-size: 11px; opacity: 0.6; }
+  .tc-mini-links {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .tc-mini-link {
+    height: 24px;
+    border-radius: 6px;
+    opacity: 0.7;
+  }
+  .tcl-11 { background: rgba(255,255,255,0.3); }
+  .tcl-12 { background: rgba(255,255,255,0.2); width: 80%; }
+  .tcl-21 { background: rgba(239,68,68,0.4); }
+  .tcl-22 { background: rgba(239,68,68,0.25); width: 80%; }
+  .tcl-31 { background: rgba(5,150,105,0.4); }
+  .tcl-32 { background: rgba(5,150,105,0.25); width: 80%; }
+  .tcl-41 { background: rgba(124,58,237,0.4); }
+  .tcl-42 { background: rgba(124,58,237,0.25); width: 80%; }
+  .tc-meta {
+    padding: 16px 20px;
+  }
+  .tc-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .tc-desc {
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  .tc-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 100px;
+    margin-top: 8px;
+    background: var(--blue-pale);
+    color: var(--blue);
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  #testimonials {
+    background: var(--white);
+    overflow: hidden;
+  }
+  .testi-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+  .testi-header .section-desc { margin: 0 auto; }
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .testi-card {
+    padding: 32px;
+    border-radius: 20px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .testi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+  }
+  .testi-stars {
+    display: flex; gap: 4px;
+    margin-bottom: 16px;
+  }
+  .testi-star {
+    color: #F59E0B;
+    font-size: 14px;
+  }
+  .testi-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--ink);
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+  .testi-author {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .testi-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .ta-1 { background: var(--blue); }
+  .ta-2 { background: #EC4899; }
+  .ta-3 { background: #7C3AED; }
+  .ta-4 { background: #059669; }
+  .ta-5 { background: #F59E0B; }
+  .ta-6 { background: #EF4444; }
+  .testi-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .testi-role {
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  /* ─── PRICING ─── */
+  #pricing {
+    background: var(--cream);
+  }
+  .pricing-header { text-align: center; margin-bottom: 64px; }
+  .pricing-header .section-desc { margin: 0 auto; }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .price-card {
+    padding: 36px;
+    border-radius: 24px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+  .price-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.08);
+  }
+  .price-card.featured {
+    background: var(--blue);
+    border-color: var(--blue);
+    transform: scale(1.04);
+  }
+  .price-card.featured:hover {
+    transform: scale(1.04) translateY(-6px);
+  }
+  .pc-badge {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--cream);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+  }
+  .pc-plan {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 12px;
+  }
+  .price-card.featured .pc-plan { color: rgba(255,255,255,0.6); }
+  .pc-price {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -2px;
+    margin-bottom: 4px;
+  }
+  .price-card.featured .pc-price { color: var(--white); }
+  .pc-period {
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+  .price-card.featured .pc-period { color: rgba(255,255,255,0.6); }
+  .pc-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .pc-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--ink-muted);
+  }
+  .price-card.featured .pc-features li { color: rgba(255,255,255,0.75); }
+  .pc-check {
+    width: 18px; height: 18px;
+    background: var(--blue-pale);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--blue);
+  }
+  .price-card.featured .pc-check { background: rgba(255,255,255,0.2); color: var(--white); }
+  .btn-plan {
+    width: 100%;
+    padding: 14px;
+    border-radius: 100px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+  .btn-plan-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink);
+  }
+  .btn-plan-outline:hover { border-color: var(--ink-muted); }
+  .btn-plan-white {
+    background: var(--white);
+    border: none;
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .btn-plan-white:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
+
+  /* ─── FAQ ─── */
+  #faq {
+    background: var(--white);
+  }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-top: 64px;
+    align-items: start;
+  }
+  .faq-list { display: flex; flex-direction: column; gap: 0; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    cursor: pointer;
+  }
+  .faq-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    user-select: none;
+  }
+  .faq-arrow {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.3s, background 0.2s;
+    font-size: 12px;
+  }
+  .faq-item.open .faq-arrow {
+    transform: rotate(45deg);
+    background: var(--blue);
+    color: var(--white);
+  }
+  .faq-a {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.75;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding-top: 0;
+  }
+  .faq-item.open .faq-a {
+    max-height: 200px;
+    padding-top: 12px;
+  }
+  .faq-visual {
+    background: var(--cream);
+    border-radius: 28px;
+    padding: 40px;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .faq-stat {
+    text-align: center;
+  }
+  .faq-num {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .faq-stat-label {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  /* ─── CTA ─── */
+  #cta {
+    background: var(--blue);
+    padding: 100px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-bg {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .cta-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 20px;
+  }
+  .cta-h2 {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.0;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .cta-sub {
+    font-size: 18px;
+    color: rgba(255,255,255,0.65);
+    max-width: 480px;
+    margin: 0 auto 44px;
+    line-height: 1.65;
+  }
+  .cta-input-wrap {
+    display: flex;
+    gap: 0;
+    max-width: 440px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 100px;
+    padding: 5px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .cta-prefix {
+    display: flex;
+    align-items: center;
+    padding: 0 8px 0 20px;
+    font-size: 15px;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  .cta-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--ink);
+    background: transparent;
+    min-width: 0;
+  }
+  .cta-input::placeholder { color: var(--ink-light); }
+  .cta-submit {
+    background: var(--blue);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .cta-submit:hover { background: var(--blue-dark); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--ink);
+    padding: 80px 48px 40px;
+    color: var(--cream);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 60px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .footer-brand-logo {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+  }
+  .footer-brand-logo span { color: var(--blue); }
+  .footer-tagline {
+    font-size: 14px;
+    color: rgba(249,248,246,0.4);
+    line-height: 1.7;
+    max-width: 260px;
+    margin-bottom: 24px;
+  }
+  .footer-social {
+    display: flex; gap: 10px;
+  }
+  .fs-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--cream);
+    transition: background 0.2s;
+  }
+  .fs-btn:hover { background: rgba(255,255,255,0.12); }
+  .footer-col-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .footer-links a {
+    font-size: 14px;
+    color: rgba(249,248,246,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--cream); }
+  .footer-bottom {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: rgba(249,248,246,0.25);
+  }
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  .reveal { opacity: 0; transform: translateY(30px); }
+  .reveal-left { opacity: 0; transform: translateX(-30px); }
+  .reveal-right { opacity: 0; transform: translateX(30px); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1024px) {
+    #hero { grid-template-columns: 1fr; gap: 60px; padding-top: 120px; }
+    .hero-visual { display: none; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .templates-grid { grid-template-columns: repeat(2, 1fr); }
+    .testi-grid { grid-template-columns: 1fr 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 360px; }
+    .price-card.featured { transform: scale(1); }
+    .price-card.featured:hover { transform: translateY(-6px); }
+    .faq-grid { grid-template-columns: 1fr; }
+    .faq-visual { display: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    section { padding: 80px 24px; }
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    #hero { padding: 110px 24px 60px; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .testi-grid { grid-template-columns: 1fr; }
+    .templates-grid { grid-template-columns: 1fr 1fr; }
+    footer { padding: 60px 24px 32px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    .cursor, .cursor-ring { display: none; }
+    #cta { padding: 80px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Link<span>Me</span></a>
+  <ul class="nav-links">
+    <li><a href="#how">Cara Kerja</a></li>
+    <li><a href="#features">Fitur</a></li>
+    <li><a href="#showcase">Template</a></li>
+    <li><a href="#pricing">Harga</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#" class="btn-ghost">Masuk</a>
+    <a href="#cta" class="btn-primary">Mulai Gratis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div>
+    <div class="hero-label reveal">✦ Profil Link Terbaik untuk Kamu</div>
+    <h1 class="hero-h1 reveal">
+      Semua <span class="accent">Link</span>-mu<br>
+      dalam<br>
+      <span class="stroke-text">Satu Tempat</span>
+    </h1>
+    <p class="hero-desc reveal">
+      Buat halaman profil ringkas yang menampung semua tautan media sosial, portofolio, dan konten favoritmu dalam satu link unik yang bisa dibagikan ke mana saja.
+    </p>
+    <div class="hero-actions reveal">
+      <a href="#cta" class="btn-hero">
+        Buat Link-mu Sekarang
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+      </a>
+      <div class="hero-social-proof">
+        <div class="avatar-stack">
+          <div class="avatar-fallback af-1">AR</div>
+          <div class="avatar-fallback af-2">BI</div>
+          <div class="avatar-fallback af-3">CD</div>
+          <div class="avatar-fallback af-4">DE</div>
+        </div>
+        <span>+50.000 kreator sudah bergabung</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-bg-circle"></div>
+    <div class="phone-mockup reveal-right">
+      <div class="phone-notch"></div>
+      <div class="profile-block">
+        <div class="profile-avatar">JD</div>
+        <div class="profile-name">Juna Diandra</div>
+        <div class="profile-handle">@junadiandra</div>
+        <div class="profile-bio">UI/UX Designer · Content Creator · Bandung 🇮🇩</div>
+      </div>
+      <a href="#" class="link-card lc-blue">
+        <div class="link-icon">🎨</div>
+        <span class="link-label">Portfolio Desain</span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="#" class="link-card lc-dark">
+        <div class="link-icon">▶</div>
+        <span class="link-label">YouTube Channel</span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="#" class="link-card lc-purple">
+        <div class="link-icon">📸</div>
+        <span class="link-label">Instagram</span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="#" class="link-card lc-pink">
+        <div class="link-icon">✍️</div>
+        <span class="link-label">Blog Pribadi</span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="#" class="link-card lc-green">
+        <div class="link-icon">💼</div>
+        <span class="link-label">Hire Me</span>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+    <div class="floating-badge fb-1 reveal">
+      <div class="fb-dot fb-dot-blue"></div>
+      <span>2,840 klik hari ini</span>
+    </div>
+    <div class="floating-badge fb-2 reveal">
+      <div class="fb-dot fb-dot-green"></div>
+      <span>Aktif sekarang</span>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marqueeTrack">
+    <div class="marquee-item"><div class="marquee-dot"></div>Instagram</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>YouTube</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>TikTok</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>LinkedIn</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Behance</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>GitHub</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Shopee</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Tokopedia</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Substack</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Spotify</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Discord</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>WhatsApp</div>
+    <!-- Duplicate for infinite -->
+    <div class="marquee-item"><div class="marquee-dot"></div>Instagram</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>YouTube</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>TikTok</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>LinkedIn</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Behance</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>GitHub</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Shopee</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Tokopedia</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Substack</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Spotify</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Discord</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>WhatsApp</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-max">
+    <div class="section-label reveal">Cara Kerja</div>
+    <h2 class="section-h2 reveal">Tiga langkah,<br>siap dipakai</h2>
+    <p class="section-desc reveal">Dari mendaftar hingga membagikan profil-mu, semua bisa selesai dalam waktu kurang dari 5 menit.</p>
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-num">01</div>
+        <div class="step-icon">✨</div>
+        <div class="step-title">Daftar & Pilih Username</div>
+        <p class="step-desc">Buat akun gratis dan pilih username unik untuk URL profil-mu. Seperti linkme.id/namamu — mudah diingat dan profesional.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">02</div>
+        <div class="step-icon">🎨</div>
+        <div class="step-title">Tambah Link & Kustomisasi</div>
+        <p class="step-desc">Tambahkan semua link-mu: media sosial, website, toko online, portofolio. Pilih tema dan atur tampilan sesuai kepribadianmu.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">03</div>
+        <div class="step-icon">🚀</div>
+        <div class="step-title">Bagikan & Pantau</div>
+        <p class="step-desc">Bagikan satu link ke bio Instagram, Twitter, atau di mana pun. Pantau berapa banyak klik dan dari mana pengunjungmu datang.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-max">
+    <div class="section-label reveal">Fitur Unggulan</div>
+    <h2 class="section-h2 reveal">Didesain untuk<br>kreator modern</h2>
+    <p class="section-desc reveal">Semua alat yang kamu butuhkan untuk membangun kehadiran online yang kuat dan terkoneksi.</p>
+    <div class="features-grid">
+      <div class="features-list">
+        <div class="feature-item active" onclick="setActiveFeature(this, 0)">
+          <div class="fi-icon">📊</div>
+          <div>
+            <div class="fi-title">Analitik Real-Time</div>
+            <div class="fi-desc">Lihat jumlah kunjungan, klik per link, dan lokasi pengunjung secara langsung.</div>
+          </div>
+        </div>
+        <div class="feature-item" onclick="setActiveFeature(this, 1)">
+          <div class="fi-icon">🎨</div>
+          <div>
+            <div class="fi-title">Tema & Kustomisasi</div>
+            <div class="fi-desc">Puluhan tema siap pakai atau buat tampilan unikmu sendiri dengan editor visual.</div>
+          </div>
+        </div>
+        <div class="feature-item" onclick="setActiveFeature(this, 2)">
+          <div class="fi-icon">🔗</div>
+          <div>
+            <div class="fi-title">Link Tanpa Batas</div>
+            <div class="fi-desc">Tambahkan berapa pun link yang kamu mau — media sosial, toko, blog, semua bisa.</div>
+          </div>
+        </div>
+        <div class="feature-item" onclick="setActiveFeature(this, 3)">
+          <div class="fi-icon">⚡</div>
+          <div>
+            <div class="fi-title">Loading Super Cepat</div>
+            <div class="fi-desc">Halaman profil dioptimasi untuk kecepatan — buka dalam hitungan milidetik.</div>
+          </div>
+        </div>
+        <div class="feature-item" onclick="setActiveFeature(this, 4)">
+          <div class="fi-icon">📱</div>
+          <div>
+            <div class="fi-title">Mobile-First Design</div>
+            <div class="fi-desc">Tampil sempurna di semua perangkat — smartphone, tablet, maupun desktop.</div>
+          </div>
+        </div>
+      </div>
+      <div class="features-mockup" id="featuresMockup">
+        <div class="fm-header">
+          <div class="fm-dot fm-red"></div>
+          <div class="fm-dot fm-yellow"></div>
+          <div class="fm-dot fm-green"></div>
+          <div class="fm-url">linkme.id/junadiandra</div>
+        </div>
+        <!-- Feature 0: Analytics -->
+        <div id="fmContent0">
+          <div class="analytics-card">
+            <div class="ac-stat">12,840</div>
+            <div class="ac-label">Total klik bulan ini</div>
+            <div class="ac-chart">
+              <div class="ac-bar" style="height:30%"></div>
+              <div class="ac-bar" style="height:50%"></div>
+              <div class="ac-bar" style="height:40%"></div>
+              <div class="ac-bar" style="height:70%"></div>
+              <div class="ac-bar" style="height:55%"></div>
+              <div class="ac-bar" style="height:85%"></div>
+              <div class="ac-bar" style="height:65%"></div>
+              <div class="ac-bar ac-bar-active" style="height:100%"></div>
+            </div>
+          </div>
+          <div class="mini-links">
+            <div class="ml-item">
+              <div class="ml-dot" style="background:var(--blue)"></div>
+              Portfolio Desain
+              <div class="ml-progress"><div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>85%</div>
+            </div>
+            <div class="ml-item">
+              <div class="ml-dot" style="background:#EC4899"></div>
+              Instagram
+              <div class="ml-progress"><div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div>62%</div>
+            </div>
+            <div class="ml-item">
+              <div class="ml-dot" style="background:#7C3AED"></div>
+              YouTube
+              <div class="ml-progress"><div class="progress-bar"><div class="progress-fill" style="width:48%"></div></div>48%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWCASE / TEMPLATES -->
+<section id="showcase">
+  <div class="section-max">
+    <div class="showcase-header">
+      <div>
+        <div class="section-label reveal">Template</div>
+        <h2 class="section-h2 reveal">Pilih temamu,<br>tampil beda</h2>
+      </div>
+      <p class="section-desc reveal" style="max-width:320px">Puluhan template dirancang oleh desainer profesional untuk berbagai kebutuhan dan personal branding.</p>
+    </div>
+    <div class="templates-grid">
+      <div class="template-card reveal">
+        <div class="tc-preview tc-1">
+          <div class="tc-avatar tca-1">JD</div>
+          <div class="tc-mini-name">Juna Diandra</div>
+          <div class="tc-handle" style="color:rgba(255,255,255,0.5)">@junadiandra</div>
+          <div class="tc-mini-links">
+            <div class="tc-mini-link tcl-11"></div>
+            <div class="tc-mini-link tcl-12"></div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <div class="tc-name">Midnight Pro</div>
+          <div class="tc-desc">Elegan, gelap, profesional</div>
+          <div class="tc-badge">Popular</div>
+        </div>
+      </div>
+      <div class="template-card reveal">
+        <div class="tc-preview tc-2">
+          <div class="tc-avatar tca-2">SR</div>
+          <div class="tc-mini-name" style="color:#7C2D12">Sari Rahayu</div>
+          <div class="tc-handle" style="color:#92400E">@sarirahayu</div>
+          <div class="tc-mini-links">
+            <div class="tc-mini-link tcl-21"></div>
+            <div class="tc-mini-link tcl-22"></div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <div class="tc-name">Warm Sunset</div>
+          <div class="tc-desc">Hangat, personal, kreatif</div>
+          <div class="tc-badge">Baru</div>
+        </div>
+      </div>
+      <div class="template-card reveal">
+        <div class="tc-preview tc-3">
+          <div class="tc-avatar tca-3">BK</div>
+          <div class="tc-mini-name" style="color:#064E3B">Bima Kusuma</div>
+          <div class="tc-handle" style="color:#065F46">@bimakusuma</div>
+          <div class="tc-mini-links">
+            <div class="tc-mini-link tcl-31"></div>
+            <div class="tc-mini-link tcl-32"></div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <div class="tc-name">Fresh Green</div>
+          <div class="tc-desc">Segar, natural, bersih</div>
+        </div>
+      </div>
+      <div class="template-card reveal">
+        <div class="tc-preview tc-4">
+          <div class="tc-avatar tca-4">NP</div>
+          <div class="tc-mini-name" style="color:#581C87">Nadia Putri</div>
+          <div class="tc-handle" style="color:#6B21A8">@nadiaputri</div>
+          <div class="tc-mini-links">
+            <div class="tc-mini-link tcl-41"></div>
+            <div class="tc-mini-link tcl-42"></div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <div class="tc-name">Dreamy Purple</div>
+          <div class="tc-desc">Artistik, feminin, estetik</div>
+          <div class="tc-badge">Favorit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-max">
+    <div class="testi-header">
+      <div class="section-label reveal">Testimoni</div>
+      <h2 class="section-h2 reveal">Dipercaya ribuan<br>kreator Indonesia</h2>
+      <p class="section-desc reveal">Dari content creator, freelancer, hingga pemilik UMKM — semua sudah merasakan manfaatnya.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Semenjak pakai LinkMe, engagement di Instagram naik karena pengunjung bisa dengan mudah menemukan semua konten saya. Tampilannya juga keren banget!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar ta-1">AR</div>
+          <div>
+            <div class="testi-name">Aldi Ramadhan</div>
+            <div class="testi-role">Content Creator · 280K Followers</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Sebagai freelance designer, LinkMe bantu saya showcase portfolio, terima order, dan connect ke semua platform dalam satu link. Client jadi lebih gampang menemukan saya."</p>
+        <div class="testi-author">
+          <div class="testi-avatar ta-2">RS</div>
+          <div>
+            <div class="testi-name">Risa Susanti</div>
+            <div class="testi-role">UI/UX Designer · Freelancer</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Fitur analitiknya super helpful! Sekarang saya tahu link mana yang paling banyak diklik dan bisa fokus di sana. Sangat rekomendasikan untuk bisnis online."</p>
+        <div class="testi-author">
+          <div class="testi-avatar ta-3">DK</div>
+          <div>
+            <div class="testi-name">Dewi Kartika</div>
+            <div class="testi-role">Owner · @belanjadewi</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Setup-nya mudah banget, nggak perlu skill teknis sama sekali. Dalam 10 menit sudah punya halaman profil yang terlihat profesional."</p>
+        <div class="testi-author">
+          <div class="testi-avatar ta-4">BP</div>
+          <div>
+            <div class="testi-name">Budi Pratama</div>
+            <div class="testi-role">Musisi · Songwriter</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Template-nya beragam dan bisa dikustomisasi sesuai brand. Saya suka banget hasilnya — terlihat eksklusif dan konsisten dengan feed Instagram saya."</p>
+        <div class="testi-author">
+          <div class="testi-avatar ta-5">LH</div>
+          <div>
+            <div class="testi-name">Lina Handayani</div>
+            <div class="testi-role">Fashion Blogger · 95K Followers</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Pindah dari tools lain ke LinkMe dan tidak nyesel! Lebih cepat, lebih bagus tampilannya, dan harganya juga lebih terjangkau. Customer support-nya juga responsif."</p>
+        <div class="testi-author">
+          <div class="testi-avatar ta-6">FN</div>
+          <div>
+            <div class="testi-name">Fajar Nugraha</div>
+            <div class="testi-role">Digital Marketer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-max">
+    <div class="pricing-header">
+      <div class="section-label reveal">Harga</div>
+      <h2 class="section-h2 reveal">Mulai gratis,<br>berkembang bersama</h2>
+      <p class="section-desc reveal">Tanpa biaya tersembunyi. Upgrade kapanpun kamu siap. Downgrade atau batalkan kapanpun tanpa syarat.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="pc-plan">Free</div>
+        <div class="pc-price">Rp0</div>
+        <div class="pc-period">Selamanya gratis</div>
+        <ul class="pc-features">
+          <li><div class="pc-check">✓</div> Hingga 10 link</li>
+          <li><div class="pc-check">✓</div> 5 pilihan tema</li>
+          <li><div class="pc-check">✓</div> Analitik dasar</li>
+          <li><div class="pc-check">✓</div> Subdomain linkme.id</li>
+        </ul>
+        <a href="#cta" class="btn-plan btn-plan-outline">Mulai Gratis</a>
+      </div>
+      <div class="price-card featured reveal">
+        <div class="pc-badge">Paling Populer</div>
+        <div class="pc-plan">Pro</div>
+        <div class="pc-price">Rp29k</div>
+        <div class="pc-period">per bulan</div>
+        <ul class="pc-features">
+          <li><div class="pc-check">✓</div> Link tanpa batas</li>
+          <li><div class="pc-check">✓</div> Semua tema premium</li>
+          <li><div class="pc-check">✓</div> Analitik lengkap</li>
+          <li><div class="pc-check">✓</div> Custom domain</li>
+          <li><div class="pc-check">✓</div> Hapus branding</li>
+          <li><div class="pc-check">✓</div> Prioritas support</li>
+        </ul>
+        <a href="#cta" class="btn-plan btn-plan-white">Coba Pro Gratis 14 Hari</a>
+      </div>
+      <div class="price-card reveal">
+        <div class="pc-plan">Business</div>
+        <div class="pc-price">Rp79k</div>
+        <div class="pc-period">per bulan</div>
+        <ul class="pc-features">
+          <li><div class="pc-check">✓</div> Semua fitur Pro</li>
+          <li><div class="pc-check">✓</div> Multiple profil</li>
+          <li><div class="pc-check">✓</div> Team collaboration</li>
+          <li><div class="pc-check">✓</div> API access</li>
+          <li><div class="pc-check">✓</div> White-label option</li>
+        </ul>
+        <a href="#cta" class="btn-plan btn-plan-outline">Hubungi Kami</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-max">
+    <div class="faq-grid">
+      <div>
+        <div class="section-label reveal">FAQ</div>
+        <h2 class="section-h2 reveal">Pertanyaan<br>yang sering ditanya</h2>
+        <div class="faq-list" style="margin-top:40px">
+          <div class="faq-item open reveal" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              Apakah LinkMe benar-benar gratis?
+              <div class="faq-arrow">+</div>
+            </div>
+            <div class="faq-a">Ya! Plan Free LinkMe benar-benar gratis selamanya tanpa batas waktu. Kamu bisa membuat profil dengan hingga 10 link, 5 tema, dan analitik dasar tanpa perlu kartu kredit.</div>
+          </div>
+          <div class="faq-item reveal" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              Bisakah saya menggunakan domain sendiri?
+              <div class="faq-arrow">+</div>
+            </div>
+            <div class="faq-a">Ya! Dengan plan Pro dan Business, kamu bisa menghubungkan domain kustom milikmu. Jadi profil bisa diakses melalui nama.com dan bukan hanya linkme.id/username.</div>
+          </div>
+          <div class="faq-item reveal" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              Berapa banyak link yang bisa saya tambahkan?
+              <div class="faq-arrow">+</div>
+            </div>
+            <div class="faq-a">Plan Free mendukung hingga 10 link. Plan Pro dan Business mendukung link tanpa batas — tambahkan semua platform, toko online, dan konten yang kamu punya.</div>
+          </div>
+          <div class="faq-item reveal" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              Apakah ada kontrak atau komitmen jangka panjang?
+              <div class="faq-arrow">+</div>
+            </div>
+            <div class="faq-a">Tidak sama sekali. Semua plan berbayar bersifat bulanan dan bisa dibatalkan kapan saja. Tidak ada kontrak, tidak ada biaya penalti, dan data kamu akan tetap aman.</div>
+          </div>
+          <div class="faq-item reveal" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              Bagaimana cara kerja analitik LinkMe?
+              <div class="faq-arrow">+</div>
+            </div>
+            <div class="faq-a">LinkMe melacak setiap kunjungan dan klik pada profilmu secara real-time. Kamu bisa melihat total kunjungan, klik per link, asal negara pengunjung, perangkat yang digunakan, dan tren dari waktu ke waktu.</div>
+          </div>
+        </div>
+      </div>
+      <div class="faq-visual reveal-right">
+        <div class="faq-stat">
+          <div class="faq-num">50K+</div>
+          <div class="faq-stat-label">Pengguna aktif di Indonesia</div>
+        </div>
+        <div style="width:100%;height:1px;background:var(--border)"></div>
+        <div class="faq-stat">
+          <div class="faq-num">2.4M</div>
+          <div class="faq-stat-label">Link diklik setiap bulan</div>
+        </div>
+        <div style="width:100%;height:1px;background:var(--border)"></div>
+        <div class="faq-stat">
+          <div class="faq-num">99.9%</div>
+          <div class="faq-stat-label">Uptime yang terjamin</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-bg"></div>
+  <div class="cta-label">Siap memulai?</div>
+  <h2 class="cta-h2">Buat profil link-mu<br>sekarang juga</h2>
+  <p class="cta-sub">Gratis selamanya. Tidak perlu kartu kredit. Setup dalam 2 menit.</p>
+  <div class="cta-input-wrap">
+    <span class="cta-prefix">linkme.id/</span>
+    <input class="cta-input" type="text" placeholder="username-mu" id="ctaUsername">
+    <button class="cta-submit" onclick="handleClaim()">Klaim Sekarang →</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-logo">Link<span>Me</span></div>
+      <p class="footer-tagline">Aplikasi web untuk membuat halaman profil ringkas yang menampung berbagai tautan media sosial dan portofolio dalam satu link unik.</p>
+      <div class="footer-social">
+        <a href="#" class="fs-btn">𝕏</a>
+        <a href="#" class="fs-btn">in</a>
+        <a href="#" class="fs-btn">ig</a>
+        <a href="#" class="fs-btn">▶</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Produk</div>
+      <ul class="footer-links">
+        <li><a href="#">Fitur</a></li>
+        <li><a href="#">Template</a></li>
+        <li><a href="#">Harga</a></li>
+        <li><a href="#">Changelog</a></li>
+        <li><a href="#">Roadmap</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Perusahaan</div>
+      <ul class="footer-links">
+        <li><a href="#">Tentang Kami</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Karir</a></li>
+        <li><a href="#">Press</a></li>
+        <li><a href="#">Kontak</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Dukungan</div>
+      <ul class="footer-links">
+        <li><a href="#">Pusat Bantuan</a></li>
+        <li><a href="#">Status</a></li>
+        <li><a href="#">Kebijakan Privasi</a></li>
+        <li><a href="#">Syarat & Ketentuan</a></li>
+        <li><a href="#">API Docs</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 LinkMe. Dibuat dengan ❤ di Indonesia.</span>
+    <span>All rights reserved.</span>
+  </div>
+</footer>
+
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    gsap.set(cursor, { x: mouseX - 5, y: mouseY - 5 });
+  });
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    gsap.set(cursorRing, { x: ringX - 18, y: ringY - 18 });
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+  document.querySelectorAll('a, button, .template-card, .step-card, .feature-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      gsap.to(cursor, { scale: 2.5, duration: 0.2 });
+      gsap.to(cursorRing, { scale: 1.5, opacity: 0.3, duration: 0.2 });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to(cursor, { scale: 1, duration: 0.2 });
+      gsap.to(cursorRing, { scale: 1, opacity: 0.5, duration: 0.2 });
+    });
+  });
+
+  // Scroll animations
+  gsap.utils.toArray('.reveal').forEach((el, i) => {
+    gsap.fromTo(el, { opacity: 0, y: 40 }, {
+      opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+      delay: (i % 4) * 0.08
+    });
+  });
+  gsap.utils.toArray('.reveal-left').forEach(el => {
+    gsap.fromTo(el, { opacity: 0, x: -40 }, {
+      opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' }
+    });
+  });
+  gsap.utils.toArray('.reveal-right').forEach(el => {
+    gsap.fromTo(el, { opacity: 0, x: 40 }, {
+      opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' }
+    });
+  });
+
+  // Hero number counter
+  function animateCounter(el, end, duration) {
+    let start = 0;
+    const step = end / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= end) { el.textContent = end.toLocaleString('id'); clearInterval(timer); }
+      else { el.textContent = Math.floor(start).toLocaleString('id'); }
+    }, 16);
+  }
+  ScrollTrigger.create({
+    trigger: '#features',
+    start: 'top 70%',
+    onEnter: () => {
+      const stat = document.querySelector('.ac-stat');
+      if (stat) animateCounter(stat, 12840, 1500);
+    }
+  });
+
+  // FAQ toggle
+  function toggleFaq(item) {
+    const allItems = document.querySelectorAll('.faq-item');
+    allItems.forEach(i => { if (i !== item) i.classList.remove('open'); });
+    item.classList.toggle('open');
+  }
+
+  // Feature tabs
+  const featureContents = [
+    `<div class="analytics-card"><div class="ac-stat">12,840</div><div class="ac-label">Total klik bulan ini</div><div class="ac-chart"><div class="ac-bar" style="height:30%"></div><div class="ac-bar" style="height:50%"></div><div class="ac-bar" style="height:40%"></div><div class="ac-bar" style="height:70%"></div><div class="ac-bar" style="height:55%"></div><div class="ac-bar" style="height:85%"></div><div class="ac-bar" style="height:65%"></div><div class="ac-bar ac-bar-active" style="height:100%"></div></div></div><div class="mini-links"><div class="ml-item"><div class="ml-dot" style="background:var(--blue)"></div>Portfolio Desain<div class="ml-progress"><div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>85%</div></div><div class="ml-item"><div class="ml-dot" style="background:#EC4899"></div>Instagram<div class="ml-progress"><div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div>62%</div></div><div class="ml-item"><div class="ml-dot" style="background:#7C3AED"></div>YouTube<div class="ml-progress"><div class="progress-bar"><div class="progress-fill" style="width:48%"></div></div>48%</div></div></div>`,
+    `<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:16px"><div style="font-size:13px;color:rgba(249,248,246,0.5);margin-bottom:12px">Pilih Tema</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${['#0F172A','#FFF7ED','#F0FDF4','#FDF4FF','#EEF3FF','#1A1A2E','#FFF0F3','#F5F5DC'].map(c=>`<div style="height:44px;background:${c};border-radius:10px;border:1px solid rgba(255,255,255,0.1);cursor:pointer"></div>`).join('')}</div></div><div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px"><div style="font-size:13px;color:rgba(249,248,246,0.5);margin-bottom:10px">Warna Aksen</div><div style="display:flex;gap:8px">${['#1B56FD','#EC4899','#7C3AED','#059669','#F59E0B','#EF4444'].map(c=>`<div style="width:32px;height:32px;background:${c};border-radius:50%;cursor:pointer"></div>`).join('')}</div></div>`,
+    `<div class="mini-links">${['🎨 Portfolio Desain','▶ YouTube Channel','📸 Instagram','✍️ Blog Pribadi','💼 Hire Me','🛒 Toko Online','🎵 Spotify','📧 Email'].map((l,i)=>`<div class="ml-item" style="cursor:pointer"><span>${l}</span><div class="ml-progress" style="font-size:11px;color:rgba(249,248,246,0.3)">${['1,240','983','756','534','421','380','290','185'][i]} klik</div></div>`).join('')}</div>`,
+    `<div style="background:rgba(255,255,255,0.06);border-radius:16px;padding:20px;text-align:center"><div style="font-family:Syne,sans-serif;font-size:48px;font-weight:800;color:#4ADE80">98<span style="font-size:24px">ms</span></div><div style="font-size:13px;color:rgba(249,248,246,0.4);margin-bottom:20px">Waktu loading rata-rata</div><div style="display:flex;justify-content:space-around;margin-top:16px"><div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--cream)">100</div><div style="font-size:11px;color:rgba(249,248,246,0.35)">Performance</div></div><div><div style="font-size:20px;font-weight:700;color:var(--cream)">100</div><div style="font-size:11px;color:rgba(249,248,246,0.35)">SEO</div></div><div><div style="font-size:20px;font-weight:700;color:var(--cream)">100</div><div style="font-size:11px;color:rgba(249,248,246,0.35)">Accessibility</div></div></div></div>`,
+    `<div style="display:flex;gap:16px;justify-content:center;align-items:flex-end;padding:20px 0"><div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:20px;width:160px"><div style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:center">📱</div><div style="font-size:12px;font-weight:600;color:var(--cream);margin-bottom:4px">Mobile</div><div style="font-size:11px;color:rgba(249,248,246,0.35)">72% traffic</div><div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:10px;overflow:hidden"><div style="height:100%;width:72%;background:var(--blue);border-radius:2px"></div></div></div><div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:20px;width:160px"><div style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:center">💻</div><div style="font-size:12px;font-weight:600;color:var(--cream);margin-bottom:4px">Desktop</div><div style="font-size:11px;color:rgba(249,248,246,0.35)">28% traffic</div><div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:10px;overflow:hidden"><div style="height:100%;width:28%;background:#EC4899;border-radius:2px"></div></div></div></div>`
+  ];
+  function setActiveFeature(clickedItem, idx) {
+    document.querySelectorAll('.feature-item').forEach(i => i.classList.remove('active'));
+    clickedItem.classList.add('active');
+    const mockup = document.getElementById('featuresMockup');
+    const inner = mockup.querySelector('div:last-child') || mockup.children[1];
+    if (inner) {
+      gsap.to(inner, { opacity: 0, y: 10, duration: 0.2, onComplete: () => {
+        inner.innerHTML = featureContents[idx];
+        gsap.fromTo(inner, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 });
+      }});
+    }
+  }
+
+  // Navbar scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (window.scrollY > 60) {
+      nav.style.padding = '14px 48px';
+      nav.style.boxShadow = '0 4px 24px rgba(0,0,0,0.06)';
+    } else {
+      nav.style.padding = '20px 48px';
+      nav.style.boxShadow = 'none';
+    }
+  });
+
+  // Phone mockup floating animation
+  gsap.to('.phone-mockup', {
+    y: -12,
+    duration: 3,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: -1
+  });
+  gsap.to('.fb-1', { y: -8, duration: 2.5, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 0.5 });
+  gsap.to('.fb-2', { y: 8, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1 });
+
+  // CTA handler
+  function handleClaim() {
+    const val = document.getElementById('ctaUsername').value.trim();
+    if (val) {
+      alert(`Selamat! linkme.id/${val} siap dibuat. (Demo)`);
+    } else {
+      document.getElementById('ctaUsername').focus();
+    }
+  }
+
+  // Stagger step cards
+  gsap.utils.toArray('.step-card').forEach((card, i) => {
+    gsap.fromTo(card, { opacity: 0, y: 50 }, {
+      opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+      scrollTrigger: { trigger: card, start: 'top 85%' },
+      delay: i * 0.15
+    });
+  });
+
+  // Stagger template cards
+  gsap.utils.toArray('.template-card').forEach((card, i) => {
+    gsap.fromTo(card, { opacity: 0, scale: 0.92 }, {
+      opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.4)',
+      scrollTrigger: { trigger: card, start: 'top 88%' },
+      delay: i * 0.1
+    });
+  });
+</script>
+</body>
+</html>
