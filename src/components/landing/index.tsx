@@ -1,6 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import {
+  Smartphone,
+  Laptop,
+  X,
+  Linkedin,
+  InstagramIcon,
+  Youtube as YoutubeIcon
+} from 'lucide-react'
 
 // ─── Marquee ──────────────────────────────────────────────────
 const PLATFORMS = ['Instagram','YouTube','TikTok','LinkedIn','Behance','GitHub','Shopee','Tokopedia','Substack','Spotify','Discord','WhatsApp']
@@ -29,15 +37,58 @@ const STEPS = [
 ]
 
 export function HowItWorks() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    import('gsap').then(({ gsap }) => {
+      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger)
+
+        const ctx = gsap.context(() => {
+          // Animate heading
+          gsap.fromTo('.hiw-heading',
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+          )
+          // Animate description
+          gsap.fromTo('.hiw-desc',
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+          )
+          // Animate step cards with stagger
+          gsap.fromTo('.step-card',
+            { opacity: 0, y: 60, scale: 0.9 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.8,
+              stagger: 0.2,
+              ease: 'back.out(1.7)',
+              scrollTrigger: {
+                trigger: '.steps-grid',
+                start: 'top 80%',
+              }
+            }
+          )
+        }, sectionRef)
+
+        return () => ctx.revert()
+      })
+    })
+  }, [])
+
   return (
-    <section id="how" className="py-28 px-8 bg-white">
+    <section id="how" ref={sectionRef} className="py-28 px-8 bg-white">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">Cara Kerja</div>
-        <h2 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-4">Tiga langkah,<br />siap dipakai</h2>
-        <p className="text-lg text-ink-muted font-light max-w-md mb-14">Dari mendaftar hingga membagikan profil-mu, semua selesai dalam 5 menit.</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {STEPS.map(s => (
-            <div key={s.num} className="relative p-10 rounded-3xl border border-[var(--border)] bg-cream hover:-translate-y-2 transition-transform duration-300">
+        <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand hiw-label">Cara Kerja</div>
+        <h2 className="hiw-heading font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-4">Tiga langkah,<br />siap dipakai</h2>
+        <p className="hiw-desc text-lg text-ink-muted font-light max-w-md mb-14">Dari mendaftar hingga membagikan profil-mu, semua selesai dalam 5 menit.</p>
+        <div className="steps-grid grid grid-cols-1 md:grid-cols-3 gap-6">
+          {STEPS.map((s) => (
+            <div key={s.num} className="step-card relative p-10 rounded-3xl border border-[var(--border)] bg-cream hover:-translate-y-2 transition-transform duration-300">
               <div className="absolute top-5 right-6 font-display text-7xl font-extrabold text-black/5 leading-none select-none">{s.num}</div>
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-6"></div>
               <h3 className="font-display text-lg font-bold text-ink mb-3">{s.title}</h3>
@@ -119,7 +170,9 @@ const FEATURE_CONTENTS = [
   // 4: Mobile
   <div key="mobile" style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'flex-end', padding: '20px 0' }}>
     <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '28px', padding: '20px', width: '160px' }}>
-      <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', borderRadius: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📱</div>
+      <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', borderRadius: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Smartphone size={20} className="text-cream/60" />
+      </div>
       <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--cream)', marginBottom: '4px' }}>Mobile</div>
       <div style={{ fontSize: '11px', color: 'rgba(249,248,246,0.35)' }}>72% traffic</div>
       <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', marginTop: '10px', overflow: 'hidden' }}>
@@ -127,7 +180,9 @@ const FEATURE_CONTENTS = [
       </div>
     </div>
     <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '28px', padding: '20px', width: '160px' }}>
-      <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', borderRadius: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>💻</div>
+      <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', borderRadius: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Laptop size={20} className="text-cream/60" />
+      </div>
       <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--cream)', marginBottom: '4px' }}>Desktop</div>
       <div style={{ fontSize: '11px', color: 'rgba(249,248,246,0.35)' }}>28% traffic</div>
       <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', marginTop: '10px', overflow: 'hidden' }}>
@@ -141,6 +196,7 @@ export function Features() {
   const [activeFeature, setActiveFeature] = useState(0)
   const featuresRef = useRef<HTMLDivElement>(null)
   const mockupRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -149,24 +205,56 @@ export function Features() {
       import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
         gsap.registerPlugin(ScrollTrigger)
 
-        const items = featuresRef.current?.querySelectorAll('.feature-item')
-        if (items?.length) {
-          gsap.fromTo(
-            items,
+        const ctx = gsap.context(() => {
+          gsap.fromTo('.features-label',
             { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+          )
+          gsap.fromTo('.features-heading',
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 }
+          )
+          gsap.fromTo('.features-desc',
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+          )
+
+          const items = featuresRef.current?.querySelectorAll('.feature-item')
+          if (items?.length) {
+            gsap.fromTo(
+              items,
+              { opacity: 0, x: -30 },
+              {
+                opacity: 1,
+                x: 0,
+                duration: 0.5,
+                stagger: 0.1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: featuresRef.current,
+                  start: 'top 85%',
+                },
+              }
+            )
+          }
+
+          gsap.fromTo('.features-mockup',
+            { opacity: 0, x: 40, scale: 0.95 },
             {
               opacity: 1,
-              y: 0,
-              duration: 0.6,
-              stagger: 0.12,
-              ease: 'power3.out',
+              x: 0,
+              scale: 1,
+              duration: 0.8,
+              ease: 'back.out(1.7)',
               scrollTrigger: {
-                trigger: featuresRef.current,
-                start: 'top 85%',
-              },
+                trigger: '.features-grid',
+                start: 'top 80%',
+              }
             }
           )
-        }
+        }, sectionRef)
+
+        return () => ctx.revert()
       })
     })
   }, [])
@@ -177,17 +265,20 @@ export function Features() {
     import('gsap').then(({ gsap }) => {
       const content = mockupRef.current?.querySelector('.feature-content')
       if (content) {
-        gsap.fromTo(content, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' })
+        gsap.fromTo(content,
+          { opacity: 0, y: 16, scale: 0.98 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: 'power3.out' }
+        )
       }
     })
   }, [activeFeature])
 
   return (
-    <section id="features" className="py-28 px-8 bg-ink">
+    <section id="features" ref={sectionRef} className="py-28 px-8 bg-ink">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-400">Fitur Unggulan</div>
-        <h2 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-cream mb-4">Didesain untuk<br />kreator modern</h2>
-        <p className="text-lg text-cream/40 font-light max-w-md mb-14">Semua alat yang kamu butuhkan untuk membangun kehadiran online yang kuat.</p>
+        <div className="features-label mb-4 text-xs font-semibold uppercase tracking-widest text-blue-400">Fitur Unggulan</div>
+        <h2 className="features-heading font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-cream mb-4">Didesain untuk<br />kreator modern</h2>
+        <p className="features-desc text-lg text-cream/40 font-light max-w-md mb-14">Semua alat yang kamu butuhkan untuk membangun kehadiran online yang kuat.</p>
         <div ref={featuresRef} className="features-grid">
           <div className="features-list">
             {FEATURES.map((f, i) => (
@@ -227,8 +318,40 @@ const TEMPLATES = [
 ]
 
 export function Templates() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    import('gsap').then(({ gsap }) => {
+      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger)
+
+        const ctx = gsap.context(() => {
+          gsap.fromTo('.template-card',
+            { opacity: 0, y: 50, scale: 0.9 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.7,
+              stagger: 0.15,
+              ease: 'back.out(1.5)',
+              scrollTrigger: {
+                trigger: '.template-grid',
+                start: 'top 80%',
+              }
+            }
+          )
+        }, sectionRef)
+
+        return () => ctx.revert()
+      })
+    })
+  }, [])
+
   return (
-    <section id="showcase" className="py-28 px-8">
+    <section id="showcase" ref={sectionRef} className="py-28 px-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-end mb-14 gap-4 flex-wrap">
           <div>
@@ -237,9 +360,9 @@ export function Templates() {
           </div>
           <p className="text-base text-ink-muted max-w-xs">Puluhan template dirancang oleh desainer profesional untuk berbagai kebutuhan.</p>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="template-grid grid grid-cols-2 lg:grid-cols-4 gap-5">
           {TEMPLATES.map(t => (
-            <div key={t.name} className="rounded-2xl overflow-hidden border border-[var(--border)] bg-white hover:-translate-y-2 hover:shadow-xl transition-all duration-300 cursor-pointer group">
+            <div key={t.name} className="template-card rounded-2xl overflow-hidden border border-[var(--border)] bg-white hover:-translate-y-2 hover:shadow-xl transition-all duration-300 cursor-pointer group">
               <div className={`${t.bg} h-52 flex flex-col items-center justify-center p-5`}>
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-display font-bold text-lg mb-2" style={{ background: t.accent }}>
                   {t.name.slice(0, 2).toUpperCase()}
@@ -274,17 +397,57 @@ const TESTIMONIALS = [
 ]
 
 export function Testimonials() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    import('gsap').then(({ gsap }) => {
+      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger)
+
+        const ctx = gsap.context(() => {
+          gsap.fromTo('.testimonial-heading',
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+          )
+          gsap.fromTo('.testimonial-desc',
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+          )
+          gsap.fromTo('.testimonial-card',
+            { opacity: 0, y: 60, scale: 0.95 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.7,
+              stagger: 0.12,
+              ease: 'back.out(1.7)',
+              scrollTrigger: {
+                trigger: '.testimonial-grid',
+                start: 'top 80%',
+              }
+            }
+          )
+        }, sectionRef)
+
+        return () => ctx.revert()
+      })
+    })
+  }, [])
+
   return (
-    <section id="testimonials" className="py-28 px-8 bg-white">
+    <section id="testimonials" ref={sectionRef} className="py-28 px-8 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">Testimoni</div>
-          <h2 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-4">Dipercaya ribuan<br />kreator Indonesia</h2>
-          <p className="text-base text-ink-muted max-w-md mx-auto">Dari content creator, freelancer, hingga pemilik UMKM — semua sudah merasakan manfaatnya.</p>
+          <h2 className="testimonial-heading font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-4">Dipercaya ribuan<br />kreator Indonesia</h2>
+          <p className="testimonial-desc text-base text-ink-muted max-w-md mx-auto">Dari content creator, freelancer, hingga pemilik UMKM — semua sudah merasakan manfaatnya.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="testimonial-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {TESTIMONIALS.map(t => (
-            <div key={t.name} className="p-7 rounded-2xl bg-cream border border-[var(--border)] hover:-translate-y-1 transition-transform duration-300">
+            <div key={t.name} className="testimonial-card p-7 rounded-2xl bg-cream border border-[var(--border)] hover:-translate-y-1 transition-transform duration-300">
               <div className="flex gap-0.5 mb-4">{Array(5).fill(null).map((_,i) => <span key={i} className="text-amber-400 text-sm">★</span>)}</div>
               <p className="text-sm text-ink leading-relaxed mb-5 italic">"{t.text}"</p>
               <div className="flex items-center gap-3">
@@ -310,19 +473,59 @@ const PLANS = [
 ]
 
 export function Pricing() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    import('gsap').then(({ gsap }) => {
+      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger)
+
+        const ctx = gsap.context(() => {
+          gsap.fromTo('.pricing-heading',
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+          )
+          gsap.fromTo('.pricing-desc',
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+          )
+          gsap.fromTo('.pricing-card',
+            { opacity: 0, y: 50, scale: 0.9 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.7,
+              stagger: 0.2,
+              ease: 'back.out(1.7)',
+              scrollTrigger: {
+                trigger: '.pricing-grid',
+                start: 'top 80%',
+              }
+            }
+          )
+        }, sectionRef)
+
+        return () => ctx.revert()
+      })
+    })
+  }, [])
+
   return (
-    <section id="pricing" className="py-28 px-8">
+    <section id="pricing" ref={sectionRef} className="py-28 px-8">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">Harga</div>
-          <h2 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-4">Mulai gratis,<br />berkembang bersama</h2>
-          <p className="text-base text-ink-muted max-w-md mx-auto">Tanpa biaya tersembunyi. Upgrade kapanpun kamu siap.</p>
+          <h2 className="pricing-heading font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-4">Mulai gratis,<br />berkembang bersama</h2>
+          <p className="pricing-desc text-base text-ink-muted max-w-md mx-auto">Tanpa biaya tersembunyi. Upgrade kapanpun kamu siap.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+        <div className="pricing-grid grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
           {PLANS.map(p => (
             <div
               key={p.name}
-              className={`relative p-8 rounded-3xl border transition-all duration-300 hover:-translate-y-1 ${
+              className={`pricing-card relative p-8 rounded-3xl border transition-all duration-300 hover:-translate-y-1 ${
                 p.featured ? 'bg-brand border-brand scale-105 shadow-xl shadow-brand/25' : 'bg-white border-[var(--border)]'
               }`}
             >
@@ -366,15 +569,64 @@ const FAQS = [
 ]
 
 export function FAQ() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    import('gsap').then(({ gsap }) => {
+      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger)
+
+        const ctx = gsap.context(() => {
+          gsap.fromTo('.faq-heading',
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+          )
+          gsap.fromTo('.faq-item',
+            { opacity: 0, x: -30 },
+            {
+              opacity: 1,
+              x: 0,
+              duration: 0.5,
+              stagger: 0.1,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: '.faq-list',
+                start: 'top 80%',
+              }
+            }
+          )
+          gsap.fromTo('.faq-stat',
+            { opacity: 0, scale: 0.8 },
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 0.6,
+              stagger: 0.15,
+              ease: 'back.out(1.7)',
+              scrollTrigger: {
+                trigger: '.faq-stats',
+                start: 'top 80%',
+              }
+            }
+          )
+        }, sectionRef)
+
+        return () => ctx.revert()
+      })
+    })
+  }, [])
+
   return (
-    <section id="faq" className="py-28 px-8 bg-white">
+    <section id="faq" ref={sectionRef} className="py-28 px-8 bg-white">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
         <div>
           <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">FAQ</div>
-          <h2 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-10">Pertanyaan<br />yang sering ditanya</h2>
-          <div className="space-y-0">
+          <h2 className="faq-heading font-display text-4xl lg:text-5xl font-extrabold tracking-tight text-ink mb-10">Pertanyaan<br />yang sering ditanya</h2>
+          <div className="faq-list space-y-0">
             {FAQS.map((faq, i) => (
-              <details key={i} className="group border-b border-[var(--border)] py-5">
+              <details key={i} className="faq-item group border-b border-[var(--border)] py-5">
                 <summary className="flex justify-between items-center cursor-pointer list-none gap-4">
                   <span className="font-display text-base font-bold text-ink">{faq.q}</span>
                   <span className="w-7 h-7 rounded-full bg-cream flex items-center justify-center text-sm flex-shrink-0 group-open:bg-brand group-open:text-white transition-all group-open:rotate-45">+</span>
@@ -384,9 +636,9 @@ export function FAQ() {
             ))}
           </div>
         </div>
-        <div className="bg-cream rounded-3xl p-10 flex flex-col items-center justify-center gap-8">
+        <div className="faq-stats bg-cream rounded-3xl p-10 flex flex-col items-center justify-center gap-8">
           {[{ num: '50K+', label: 'Pengguna aktif di Indonesia' }, { num: '2.4M', label: 'Link diklik setiap bulan' }, { num: '99.9%', label: 'Uptime yang terjamin' }].map((s, i) => (
-            <div key={i} className={`text-center w-full ${i < 2 ? 'border-b border-[var(--border)] pb-8' : ''}`}>
+            <div key={i} className={`faq-stat text-center w-full ${i < 2 ? 'border-b border-[var(--border)] pb-8' : ''}`}>
               <div className="font-display text-5xl font-extrabold text-brand tracking-tight">{s.num}</div>
               <div className="text-sm text-ink-muted mt-2">{s.label}</div>
             </div>
@@ -399,16 +651,47 @@ export function FAQ() {
 
 // ─── CTA ──────────────────────────────────────────────────────
 export function CTA() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    import('gsap').then(({ gsap }) => {
+      const ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+          }
+        })
+        tl.fromTo('.cta-label', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' })
+          .fromTo('.cta-heading', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.4')
+          .fromTo('.cta-desc', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.5')
+          .fromTo('.cta-form', { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'back.out(1.7)' }, '-=0.4')
+
+        gsap.to('.cta-bg', {
+          scale: 1.1,
+          duration: 8,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1
+        })
+      }, sectionRef)
+
+      return () => ctx.revert()
+    })
+  }, [])
+
   return (
-    <section id="cta" className="py-24 px-8 bg-brand relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.12)_0%,transparent_70%)]" />
+    <section id="cta" ref={sectionRef} className="py-24 px-8 bg-brand relative overflow-hidden">
+      <div className="cta-bg absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.12)_0%,transparent_70%)]" />
       <div className="max-w-2xl mx-auto text-center relative">
-        <div className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-5">Siap memulai?</div>
-        <h2 className="font-display text-4xl lg:text-6xl font-extrabold tracking-tight text-white mb-5">
+        <div className="cta-label text-xs font-semibold uppercase tracking-widest text-white/50 mb-5">Siap memulai?</div>
+        <h2 className="cta-heading font-display text-4xl lg:text-6xl font-extrabold tracking-tight text-white mb-5">
           Buat profil link-mu<br />sekarang juga
         </h2>
-        <p className="text-lg text-white/60 mb-10">Gratis selamanya. Tidak perlu kartu kredit. Setup dalam 2 menit.</p>
-        <div className="flex bg-white rounded-full p-1.5 max-w-sm mx-auto shadow-2xl">
+        <p className="cta-desc text-lg text-white/60 mb-10">Gratis selamanya. Tidak perlu kartu kredit. Setup dalam 2 menit.</p>
+        <div className="cta-form flex bg-white rounded-full p-1.5 max-w-sm mx-auto shadow-2xl">
           <span className="flex items-center pl-4 text-sm text-ink-muted whitespace-nowrap">linkme.id/</span>
           <input type="text" placeholder="username-mu" className="flex-1 bg-transparent outline-none text-sm text-ink placeholder:text-ink-light px-1 min-w-0" />
           <a href="/auth/register" className="bg-brand text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-brand-dark transition-colors whitespace-nowrap">
@@ -435,8 +718,15 @@ export function Footer() {
             <div className="font-display text-xl font-extrabold text-cream mb-3">Link<span className="text-brand">Me</span></div>
             <p className="text-sm text-cream/35 leading-relaxed mb-5 max-w-52">Aplikasi web untuk membuat halaman profil ringkas dengan berbagai tautan dalam satu link unik.</p>
             <div className="flex gap-2">
-              {['𝕏','in','ig','▶'].map(s => (
-                <a key={s} href="#" className="w-8 h-8 rounded-lg bg-white/6 border border-white/8 flex items-center justify-center text-xs text-cream/60 hover:bg-white/10 transition-colors">{s}</a>
+              {[
+                { icon: X, href: '#' },
+                { icon: Linkedin, href: '#' },
+                { icon: InstagramIcon, href: '#' },
+                { icon: YoutubeIcon, href: '#' },
+              ].map(({ icon: Icon }, i) => (
+                <a key={i} href="#" className="w-8 h-8 rounded-lg bg-white/6 border border-white/8 flex items-center justify-center text-cream/60 hover:bg-white/10 transition-colors">
+                  <Icon size={14} />
+                </a>
               ))}
             </div>
           </div>

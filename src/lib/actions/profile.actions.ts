@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { isValidUsername } from '@/lib/utils'
 import type { ProfileFormData } from '@/types'
@@ -40,13 +40,25 @@ export async function updateProfile(data: ProfileFormData) {
 }
 
 export async function uploadAvatar(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) return { error: 'Unauthorized' }
 
   const file = formData.get('avatar') as File
   if (!file) return { error: 'File tidak ditemukan' }
+
+  // Validasi file
+  const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+  const maxSize = 2 * 1024 * 1024 // 2MB
+
+  if (!validTypes.includes(file.type)) {
+    return { error: 'Tipe file tidak valid (hanya JPG, PNG, GIF, WebP)' }
+  }
+
+  if (file.size > maxSize) {
+    return { error: 'Ukuran file melebihi 2MB' }
+  }
 
   const fileExt = file.name.split('.').pop()
   const filePath = `avatars/${user.id}.${fileExt}`
@@ -63,11 +75,12 @@ export async function uploadAvatar(formData: FormData) {
 
   const { error: updateError } = await supabase
     .from('profiles')
-    .update({ avatar_url: publicUrl })
+    .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
     .eq('id', user.id)
 
   if (updateError) return { error: updateError.message }
 
   revalidatePath('/dashboard')
+  revalidatePath(`/[username]`, 'page')
   return { success: true, url: publicUrl }
 }

@@ -26,7 +26,7 @@ export async function signUp(formData: FormData) {
     return { error: 'Username sudah digunakan, coba yang lain' }
   }
 
-  // Daftar user baru
+  // Daftar user baru dengan email konfirmasi
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -37,20 +37,19 @@ export async function signUp(formData: FormData) {
   })
 
   if (error) {
+    // Handle kasus email sudah terdaftar
+    if (error.message.includes('User already registered')) {
+      return { error: 'Email sudah terdaftar, silakan login atau reset password' }
+    }
     return { error: error.message }
   }
 
-  // Buat profil awal setelah sign up
-  if (data.user) {
-    await supabase.from('profiles').insert({
-      id: data.user.id,
-      username,
-      display_name: username,
-    })
-  }
+  // Profil akan otomatis dibuat oleh trigger Supabase
+  // Tidak perlu insert manual di sini
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  // Redirect ke halaman yang memberitahu user untuk cek email
+  redirect('/auth/verify?email=' + encodeURIComponent(email))
 }
 
 export async function signIn(formData: FormData) {

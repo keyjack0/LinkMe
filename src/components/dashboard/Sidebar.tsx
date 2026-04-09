@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Link2, BarChart2, Palette, Settings, ExternalLink, LogOut } from 'lucide-react'
+import { useState } from 'react'
+import { LayoutDashboard, Link2, BarChart2, Palette, Settings, ExternalLink, LogOut, X } from 'lucide-react'
 import { signOut } from '@/lib/actions/auth.actions'
 import type { Profile } from '@/types'
 import { cn, getInitials } from '@/lib/utils'
@@ -15,16 +16,31 @@ const navItems = [
   { href: '/dashboard/settings', label: 'Pengaturan', icon: Settings },
 ]
 
-export function DashboardSidebar({ profile }: { profile: Profile | null }) {
+interface Props {
+  profile: Profile | null
+  open?: boolean
+  onClose?: () => void
+}
+
+export function DashboardSidebar({ profile, open = false , onClose }: Props) {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 bg-white border-r border-[var(--border)] flex flex-col z-30">
-      {/* Logo */}
-      <div className="p-6 border-b border-[var(--border)]">
+    <>
+      {/* Overlay untuk mobile */}
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity lg:hidden ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+      />
+      <aside className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-[var(--border)] flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
+      {/* Logo + Close button (mobile) */}
+      <div className="p-6 border-b border-[var(--border)] flex items-center justify-between">
         <Link href="/" className="font-display text-xl font-extrabold text-ink tracking-tight">
           Link<span className="text-brand">Me</span>
         </Link>
+        <button onClick={onClose} className="lg:hidden p-2 text-ink-muted hover:text-ink">
+          <X size={20} />
+        </button>
       </div>
 
       {/* Profile mini */}
@@ -94,5 +110,6 @@ export function DashboardSidebar({ profile }: { profile: Profile | null }) {
         </form>
       </div>
     </aside>
+    </>
   )
 }

@@ -1,14 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { signIn, signInWithGoogle, signInWithGithub } from '@/lib/actions/auth.actions'
 
 export default function LoginPage() {
+  const searchParams = useSearchParams()
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const authError = searchParams.get('auth_error')
+    if (authError) {
+      toast.error(decodeURIComponent(authError))
+    }
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
